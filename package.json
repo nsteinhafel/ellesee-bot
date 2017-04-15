@@ -2,9 +2,10 @@
   "name": "ellesee-bot",
   "version": "0.0.1",
   "description": "A personal Discord bot.",
-  "main": "lib/ellesee-bot",
-  "typings": "lib/ellesee-bot",
+  "main": "lib/index",
+  "typings": "lib/index",
   "scripts": {
+    "start": "node lib/index.js"
   },
   "repository": {
     "type": "git",

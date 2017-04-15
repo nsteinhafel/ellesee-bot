@@ -2,7 +2,7 @@
 node_modules/
 
 # bot settings from discord
-bot-settings.json
+discord-settings.json
 
 # ignore output directory
 lib/
