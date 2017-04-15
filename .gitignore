@@ -1,2 +1,8 @@
 # ignore node dependencies
 node_modules/
+
+# bot settings from discord
+bot-settings.json
+
+# ignore output directory
+lib/
