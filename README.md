@@ -1,3 +1,3 @@
 # ellesee-bot
 
-A personal Discord bot.
+A Discord bot for me and my friends.

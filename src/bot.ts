@@ -8,18 +8,6 @@ export interface DiscordSettings {
     token: string;
 }
 
-/** A quote in BotSettings. */
-interface Quote {
-    author: string,
-    date: Date,
-    quote: string
-}
-
-/** Settings for the bot in a JSON file. */
-interface BotSettings {
-    quotes: Quote[]
-}
-
 /** Discord bot! */
 export class Bot {
     /** Discord client. */
@@ -31,9 +19,10 @@ export class Bot {
     /** Prefix for all commands. */
     private static COMMAND_PREFIX = "!";
 
-    /** Command to action mapping. */
-    private commands: { [command: string]: (message: Message) => Promise<void> } = {
-        "!hello": this.hello
+    /** Command to action mapping. Actions should be a closure to keep this scope. */
+    private commands: { [command: string]: (message: Message) => void } = {
+        '!hello': (m) => { this.hello(m); },
+        '!votekick': (m) => { this.votekick(m); }
     }
 
     /**
@@ -88,13 +77,42 @@ export class Bot {
             return;
         }
 
-        // Take action
+        // Take action.
         this.commands[command](message);
     }
 
     /** Rely to the sender with "Hello!". */
     private async hello(message: Message): Promise<void> {
-        message.reply("Hello!");
+        message.reply('Hello!');
+    }
+
+    /** Parse an id from a message part in format <@000000000000000000>. */
+    private async idFromMessagePart(messagePart: string): Promise<string> {
+        // Do we have the expected format?
+        if (!/<@\d+>/.test(messagePart)) {
+            this.trace("Invalid user from message part format:", messagePart);
+            return null;
+        }
+
+        // We know the message part is in the given format, fast strip the parts we don't need.
+        return messagePart.substring(2, messagePart.length - 1);
+    }
+
+    /** Initiate a votekick, or vote in an ongoing votekick. */
+    private async votekick(message: Message): Promise<void> {
+        // TODO check permissions and complain if we don't have permissions.
+
+        const parts = message.content.split(' ');
+        if (parts.length != 2) {
+            message.channel.sendMessage(
+                `Invalid format. Messages should be written in the following format:\`\`\`!votekick @${this.discordSettings.username}\`\`\``);
+            return;
+        }
+
+        const userId = await this.idFromMessagePart(parts[1]);
+        const user = await this.client.fetchUser(userId);
+
+        // TODO check if we have a current votekick, if so add, else, start.
     }
 
     /** Console.log with timing. */
@@ -104,9 +122,12 @@ export class Bot {
             return;
         }
 
-        // Get current time and add at the front of the arguments list.
+        // Get current time.
         const hrtime = process.hrtime();
-        args.unshift(((hrtime[0] % 1000) + (hrtime[1] / 1e9)).toFixed(3) + ':');
+
+        // Left pad time with 0s and add at the front of the arguments list.
+        const time = '000' + ((hrtime[0] % 100) + (hrtime[1] / 1e9)).toFixed(3);
+        args.unshift(time.substr(time.length - 7) + ':');
 
         // Console.log everything supplied prefixed with the time.
         console.log.apply(console, args);
