@@ -6,3 +6,5 @@ discord-settings.json
 
 # ignore output directory
 lib/
+
+.DS_Store
