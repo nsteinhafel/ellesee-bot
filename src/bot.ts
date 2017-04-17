@@ -101,15 +101,21 @@ export class Bot {
     /** Initiate a votekick, or vote in an ongoing votekick. */
     private async votekick(message: Message): Promise<void> {
         // TODO check permissions and complain if we don't have permissions.
+        const invalidFormatMessage = 
+            `Invalid format. Messages should be written in the following format:\`\`\`!votekick @${this.discordSettings.username}\`\`\``;
 
         const parts = message.content.split(' ');
         if (parts.length != 2) {
-            message.channel.sendMessage(
-                `Invalid format. Messages should be written in the following format:\`\`\`!votekick @${this.discordSettings.username}\`\`\``);
+            message.channel.sendMessage(invalidFormatMessage);
             return;
         }
 
         const userId = await this.idFromMessagePart(parts[1]);
+        if (!userId) {
+            message.channel.sendMessage(invalidFormatMessage);
+            return;
+        }
+
         const user = await this.client.fetchUser(userId);
 
         // TODO check if we have a current votekick, if so add, else, start.
