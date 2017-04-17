@@ -202,7 +202,7 @@ export class Bot {
 
                         if (found.votes.length >= found.required) {
                             // Votekick passes, kick and notify.
-                            message.channel.send(`Votekick for <@${targetId}> has passed. Kicking <@${targetId}.`);
+                            message.channel.send(`Votekick for <@${targetId}> has passed. Kicking <@${targetId}>.`);
                             target.kick();
 
                             // Remove this votekick, expire the timer.
@@ -262,7 +262,7 @@ export class Bot {
 
             // Let the channel know we've started a votekick.
             message.channel.sendMessage(
-                `Votekick initiated for <@${target.user.id}>. ${created.required} more vote(s) within 1 minute required to pass.`);
+                `Votekick initiated for <@${target.user.id}>. ${created.required - 1} more vote(s) within 1 minute required to pass.`);
         } finally {
             // Release the votekick lock.
             votekickRelease();
