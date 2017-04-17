@@ -221,8 +221,8 @@ export class Bot {
             // Get guild members and determine who can vote.
             const voters: string[] = (await message.guild.fetchMembers())
                 .members.filter((member: GuildMember) =>{
-                    // Eligible voters are online at votekick start and can send messages.
-                    return member.presence.status === 'online' && member.hasPermission("SEND_MESSAGES");
+                    // Eligible voters are determined at start to be non-robot online users that can send messages.
+                    return !member.user.bot && member.presence.status === 'online' && member.hasPermission("SEND_MESSAGES");
                 }).map((member: GuildMember) => {
                     // We want ids to store for voters.
                     return member.id;
