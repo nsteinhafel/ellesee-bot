@@ -125,15 +125,22 @@ export class Bot {
      * Parse an id from a message part in format <@000000000000000000>.
      * @param messagePart
      */
-    private async idFromMessagePart(messagePart: string): Promise<string> {
+    private async id(messagePart: string): Promise<string> {
         // Do we have the expected format?
-        if (!/<@\d+>/.test(messagePart)) {
-            this.trace("Invalid user from message part format:", messagePart);
+        if (!messagePart) {
+            this.trace('Invalid user from message part format:', messagePart);
+            return null;
+        }
+
+        // Do we have a match?
+        const match = messagePart.match(/<@!?(\d+)>/);
+        if (!match || match.length < 2) {
+            this.trace('Invalid user from message part format:', messagePart);
             return null;
         }
 
         // We know the message part is in the given format, fast strip the parts we don't need.
-        return messagePart.substring(2, messagePart.length - 1);
+        return match[1];
     }
 
     /** An array of active votekicks. */
@@ -155,7 +162,7 @@ export class Bot {
         }
 
         // Is the second part a user?
-        const targetId = await this.idFromMessagePart(parts[1]);
+        const targetId = await this.id(parts[1]);
         if (!targetId) {
             message.channel.sendMessage(invalidFormatMessage);
             return;
@@ -208,6 +215,9 @@ export class Bot {
                             // Remove this votekick, expire the timer.
                             this.votekicks.splice(foundIndex, 1);
                             this.client.clearTimeout(found.timer);
+                        } else {
+                            // Notify the channel of how many votes are left to votekick.
+                            message.channel.send(`${found.required - found.votes.length} more vote(s) required to votekick <@${targetId}>.`)
                         }
                     }
                 } else {
