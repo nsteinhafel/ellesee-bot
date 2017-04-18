@@ -302,6 +302,7 @@ export class Bot {
                 if (guild) {
                     const channel = guild.channels.get(channelId);
                     if (channel instanceof TextChannel) {
+                        // Notify the channel that we've expired the votekick.
                         (<TextChannel>channel).sendMessage(
                             `Votekick for <@${targetId}> has expired with ${found.votes.length} of ${found.required} required votes.`)
                     }
