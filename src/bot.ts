@@ -1,6 +1,7 @@
 /// <reference path='../node_modules/discord.js/typings/index.d.ts' />
 /// <reference path='../node_modules/async-mutex/lib/index.d.ts' />
 
+import { ArgumentNullError } from './errors'
 import { Channel, Client, Guild, GuildMember, Message, TextChannel } from 'discord.js'
 import { Mutex } from 'async-mutex'
 
@@ -60,10 +61,15 @@ export class Bot {
     /**
      * Build a new ellesee-bot.
      * @param discordSettings
+     * @param client: Client for dependency injection and unit testing.
      */
-    constructor(private discordSettings: DiscordSettings) {
+
+    constructor(private discordSettings: DiscordSettings, client?: Client) {
+        if (discordSettings == null)
+            throw new ArgumentNullError("discordSettings");
+
         // Initialize client.
-        this.client = new Client();
+        this.client = client || new Client();
 
         // Setup events.
         this.client.on('ready', () => { 
