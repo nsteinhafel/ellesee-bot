@@ -61,9 +61,8 @@ export class Bot {
     /**
      * Build a new ellesee-bot.
      * @param discordSettings
-     * @param client: Client for dependency injection and unit testing.
+     * @param client
      */
-
     constructor(private discordSettings: DiscordSettings, client?: Client) {
         if (discordSettings == null)
             throw new ArgumentNullError("discordSettings");
