@@ -1,11 +1,13 @@
 /// <reference path='../node_modules/discord.js/typings/index.d.ts' />
 
-import { Client, Message } from 'discord.js'
+import { Client, Message, GuildMember } from 'discord.js'
 
 import { ArgumentNullError } from './errors'
 import { Util } from './util'
 import { Command } from './commands/command'
 import { Hello } from './commands/hello'
+import { Quote } from './commands/quote'
+import { Thinking } from './commands/thinking'
 import { Votekick } from './commands/votekick'
 
 /** Settings for Discord in a JSON file. */
@@ -26,6 +28,8 @@ export class Bot {
     /** Command to action mapping. Actions should be a closure to keep this scope. */
     private commands: { [command: string]: (m: Message) => Command } = {
         '!hello': (m) => { return new Hello(this, m); },
+        '!quote': (m) => { return new Quote(this, m); },
+        '!thinking': (m) => { return new Thinking(this, m); },
         '!votekick': (m) => { return new Votekick(this, m); }
     }
 
