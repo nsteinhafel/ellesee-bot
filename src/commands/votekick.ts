@@ -36,10 +36,10 @@ interface VotekickRecord {
 export class Votekick extends Command {
 
     /** Mutex to ensure consistent operations. */
-    private lock = new Mutex();
+    private static lock = new Mutex();
 
     /** An array of active votekicks. */
-    private records: VotekickRecord[] = [];
+    private static records: VotekickRecord[] = [];
 
     /** Initiate a votekick, or vote in an ongoing votekick. */
     async run(): Promise<void> {
@@ -74,11 +74,11 @@ export class Votekick extends Command {
         }
 
         // Acquire our votekick lock.
-        const release = await this.lock.acquire();
+        const release = await Votekick.lock.acquire();
         try {
             // Find the votekick for this guild and user if we have one.
             let foundIndex: number;
-            const found = this.records.find((value, index) => {
+            const found = Votekick.records.find((value, index) => {
                 if (this.message.guild.id === value.guildId && targetId === value.targetId) {
                     foundIndex = index;
                     return true;
@@ -105,7 +105,7 @@ export class Votekick extends Command {
                             target.kick();
 
                             // Remove this votekick, expire the timer.
-                            this.records.splice(foundIndex, 1);
+                            Votekick.records.splice(foundIndex, 1);
                             this.bot.client.clearTimeout(found.timer);
                         } else {
                             // Notify the channel of how many votes are left to votekick.
@@ -160,7 +160,7 @@ export class Votekick extends Command {
             Util.log(created);
 
             // Add our votekick.
-            this.records.push(created);
+            Votekick.records.push(created);
 
             // Let the channel know we've started a votekick.
             this.message.channel.sendMessage(
@@ -178,11 +178,11 @@ export class Votekick extends Command {
      * @param targetId
      */
     private async expire(guildId: string, channelId: string, targetId: string): Promise<void> {
-        const release = await this.lock.acquire();
+        const release = await Votekick.lock.acquire();
         try {
             // Find the votekick for this guild and user if we have one.
             let foundIndex: number;
-            const found = this.records.find((value, index) => {
+            const found = Votekick.records.find((value, index) => {
                 // Match our votekick.
                 if (guildId === value.guildId && targetId === value.targetId) {
                     foundIndex = index;
@@ -203,7 +203,7 @@ export class Votekick extends Command {
                     }
                 }
 
-                this.records.splice(foundIndex, 1);
+                Votekick.records.splice(foundIndex, 1);
             }
         } finally {
             // Release the votekick lock.
