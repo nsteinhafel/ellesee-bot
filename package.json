@@ -5,8 +5,8 @@
   "main": "lib/index",
   "typings": "lib/index",
   "scripts": {
-    "start": "node lib/index.js",
-    "test": "mocha -r ts-node/register test/**/*.ts"
+    "start": "(export NODE_DEBUG=true; node lib/index.js)",
+    "test": "mocha -r ts-node/register src/test/**/*.ts"
   },
   "repository": {
     "type": "git",

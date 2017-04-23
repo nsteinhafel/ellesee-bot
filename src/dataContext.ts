@@ -16,7 +16,7 @@ export class DataContext {
      * @param url
      */
     constructor(private url: string) {
-        if (!url) throw new ArgumentError('url');
+        if (!url) throw new ArgumentError(Util.nameof({url}));
     }
 
     /** Connect to the database. */

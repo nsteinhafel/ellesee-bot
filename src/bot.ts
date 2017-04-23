@@ -19,6 +19,9 @@ export class Bot {
     /** Data context for the bot. */
     public db: DataContext;
 
+    /** Discord client. */
+    public client: Client;
+
     /** Prefix for all commands. */
     private static COMMAND_PREFIX = '!';
 
@@ -35,11 +38,14 @@ export class Bot {
      * @param discordSettings
      * @param client
      */
-    constructor(public settings: BotSettings, public client?: Client) {
-        if (!settings) throw new ArgumentError('botSettings');
+    constructor(public settings: BotSettings) {
+        if (!settings) throw new ArgumentError(Util.nameof({settings}));
 
         // Initialize client.
-        this.client = client || new Client();
+        this.client = new Client();
+
+        // Initialize database connection.
+        this.db = new DataContext(this.settings.mongoUrl);
 
         // Setup events.
         this.client.on('ready', () => { 
@@ -93,8 +99,7 @@ export class Bot {
     async start(): Promise<void> {
         Util.log('Starting.');
 
-        // Build database connection.
-        this.db = new DataContext(this.settings.mongoUrl);
+        // Connect too the database.
         await this.db.connect();
 
         // Seed if necessary.

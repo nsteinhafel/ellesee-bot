@@ -3,7 +3,7 @@
 export class Util {
 
     /** Are we debugging? */
-    private static DEBUG = true;
+    private static DEBUG: boolean = process.env.NODE_DEBUG;
 
     /** console.log with timing. */
     static log(...args: any[]): Promise<void> {
@@ -43,5 +43,13 @@ export class Util {
 
         // We know the message part is in the given format, fast strip the parts we don't need.
         return match[1];
+    }
+
+    static nameof(obj: Object): string {
+        if (!obj) {
+            return null;
+        }
+
+        return Object.keys(obj)[0];
     }
 }
