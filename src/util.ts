@@ -6,10 +6,11 @@ export class Util {
     private static DEBUG = true;
 
     /** console.log with timing. */
-    static async log(...args: any[]): Promise<void> {
+    static log(...args: any[]): Promise<void> {
         // Only log if debugging.
-        if (!Util.DEBUG)
+        if (!Util.DEBUG) {
             return;
+        }
 
         // Get current time.
         const hrtime = process.hrtime();
@@ -26,7 +27,7 @@ export class Util {
      * Parse an id from a message part in format <@!000000000000000000>.
      * @param messagePart
      */
-    static async id(messagePart: string): Promise<string> {
+    static id(messagePart: string): string {
         // Do we have the expected format?
         if (!messagePart) {
             Util.log('Invalid user from message part format:', messagePart);

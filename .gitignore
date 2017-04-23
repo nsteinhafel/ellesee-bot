@@ -1,10 +1,12 @@
+# irrelevant files
+.DS_Store
+
 # ignore node dependencies
 node_modules/
 
-# bot settings from discord
-discord-settings.json
+# local settings
+bot-settings.json
+mongo.dev.conf
 
-# ignore output directory
+# output directory
 lib/
-
-.DS_Store

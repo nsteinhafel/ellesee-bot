@@ -1,20 +1,22 @@
-/// <reference path='bot.ts' />
 
-import { DiscordSettings, Bot } from './bot';
-import * as fs from 'fs';
+import * as fs from 'async-file';
 
-let bot: Bot;
+import { Bot } from './bot';
+import { BotSettings } from './botSettings';
+import { Util } from './util';
 
-// Read the Discord settings file and start bot on successful read.
-fs.readFile(__dirname + '/discord-settings.json', (err, data) => {
-    if (err) throw err;
+(async () => {
+    // Read the Discord settings file and start bot on successful read.
+    const data = await fs.readFile(__dirname + '/bot-settings.json').catch((reason) => {
+        Util.log('Failed to read settings file.', reason);
+    });
 
     // Parse settings from file text.
-    const discordSettings = <DiscordSettings>JSON.parse(data.toString());
+    const settings = <BotSettings>JSON.parse(data.toString());
 
     // Start the bot.
-    bot = new Bot(discordSettings);
+    const bot = new Bot(settings);
     bot.start().catch((reason) => {
-        console.log("Failed to start.", reason);
+        Util.log('Failed to start.', reason);
     });
-});
+})();

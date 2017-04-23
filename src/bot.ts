@@ -2,28 +2,25 @@
 
 import { Client, Message, GuildMember } from 'discord.js'
 
-import { ArgumentNullError } from './errors'
+import { BotSettings } from './botSettings'
+import { DataContext } from './dataContext'
+import { ArgumentError } from './errors'
 import { Util } from './util'
+// TODO consolidate imports?
 import { Command } from './commands/command'
 import { Hello } from './commands/hello'
 import { Quote } from './commands/quote'
 import { Thinking } from './commands/thinking'
 import { Votekick } from './commands/votekick'
 
-/** Settings for Discord in a JSON file. */
-export interface DiscordSettings {
-    /** Bot user name. */
-    username: string;
-
-    /** Bot token. */
-    token: string;
-}
-
 /** Discord bot! */
 export class Bot {
 
+    /** Data context for the bot. */
+    public db: DataContext;
+
     /** Prefix for all commands. */
-    private static COMMAND_PREFIX = "!";
+    private static COMMAND_PREFIX = '!';
 
     /** Command to action mapping. Actions should be a closure to keep this scope. */
     private commands: { [command: string]: (m: Message) => Command } = {
@@ -38,9 +35,8 @@ export class Bot {
      * @param discordSettings
      * @param client
      */
-    constructor(public discordSettings: DiscordSettings, public client?: Client) {
-        if (discordSettings == null)
-            throw new ArgumentNullError("discordSettings");
+    constructor(public settings: BotSettings, public client?: Client) {
+        if (!settings) throw new ArgumentError('botSettings');
 
         // Initialize client.
         this.client = client || new Client();
@@ -97,8 +93,17 @@ export class Bot {
     async start(): Promise<void> {
         Util.log('Starting.');
 
+        // Build database connection.
+        this.db = new DataContext(this.settings.mongoUrl);
+        await this.db.connect();
+
+        // Seed if necessary.
+        if (!await this.db.isSeeded()) {
+            await this.db.seed();
+        }
+
         // Login to Discord.
-        await this.client.login(this.discordSettings.token);
+        await this.client.login(this.settings.discord.token);
     }
 
     /** Stop the bot. */
@@ -107,5 +112,8 @@ export class Bot {
 
         // Destroy the client to stop the bot.
         await this.client.destroy();
+
+        // Close database connection.
+        await this.db.close();
     }
 }

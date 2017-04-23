@@ -1,33 +1,18 @@
 
-import * as fs from 'fs';
-
 import { Util } from '../util'
 import { Command } from './command'
+import { QuoteModel } from '../models/quoteModel'
 
-export interface QuoteRecord {
-    /** The author of quote. */
-    author: string;
-
-    /** The quote itself. */
-    quote: string;
-}
-
+/** A class that executes the !quote command. */
 export class Quote extends Command {
 
     /** Reply with a quote. */
     async run(): Promise<void> {
-        // TODO move to db and remove fs dependency.
+        // Query for a random quote.
+        const results = this.bot.db.quotes().aggregate([{ $sample: { size: 1 } }]);
 
-        fs.readFile(__dirname + '/../seed/quotes.json', (err, data) => {
-            if (err) throw err;
-
-            // Parse quotes from file.
-            const quotes = <QuoteRecord[]>JSON.parse(data.toString());
-
-            // Math.random cannot return 1...
-            const quote = quotes[Math.floor(Math.random() * quotes.length)]
-
-            this.message.channel.sendMessage(`"${quote.quote}" - ${quote.author}`);
-        })
+        // Send quote to channel.
+        const quote = (<QuoteModel[]> await results.toArray())[0];
+        this.message.channel.sendMessage(`"${quote.quote}" - ${quote.author}`);
     }
 }

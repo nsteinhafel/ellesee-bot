@@ -5,32 +5,8 @@ import { Client, GuildMember, Message, TextChannel } from 'discord.js'
 import { Mutex } from 'async-mutex'
 
 import { Util } from '../util'
+import { VotekickModel } from '../models/votekickModel'
 import { Command } from './command'
-
-/** An instance of a "votekick". */
-interface VotekickRecord {
-
-    /** The guild id of this votekick. */
-    guildId: string;
-
-    /** The target of this votekick. */
-    targetId: string;
-
-    /** The author of this votekick. */
-    authorId: string;
-
-    /** Votekick expiry timer. */
-    timer: NodeJS.Timer;
-
-    /** Ids eligible to vote in this votekick. */
-    voters: string[];
-
-    /** Ids that voted for this votekick. */
-    votes: string[];
-
-    /** Number of votes required to pass. */
-    required: number;
-}
 
 /** A class that executes the !votekick command. */
 export class Votekick extends Command {
@@ -39,12 +15,12 @@ export class Votekick extends Command {
     private static lock = new Mutex();
 
     /** An array of active votekicks. */
-    private static records: VotekickRecord[] = [];
+    private static records: VotekickModel[] = [];
 
     /** Initiate a votekick, or vote in an ongoing votekick. */
     async run(): Promise<void> {
         const invalidFormatMessage = 
-            `Invalid format. Messages should be written in the following format:\`\`\`!votekick @${this.bot.discordSettings.username}\`\`\``;
+            `Invalid format. Messages should be written in the following format:\`\`\`!votekick @${this.bot.settings.discord.username}\`\`\``;
 
         // Do we have two parts to this message (!votekick @user)?
         const parts = this.message.content.split(' ');
@@ -54,7 +30,7 @@ export class Votekick extends Command {
         }
 
         // Is the second part a user?
-        const targetId = await Util.id(parts[1]);
+        const targetId = Util.id(parts[1]);
         if (!targetId) {
             this.message.channel.sendMessage(invalidFormatMessage);
             return;
@@ -136,18 +112,14 @@ export class Votekick extends Command {
                 return;
             }
 
-            Util.log(voters);
-
             // Expire the votekick in 1 minute if we don't reach our votekick goal.
-            const timer = await this.bot.client.setTimeout(() => {
-                this.expire(this.message.guild.id, this.message.channel.id, targetId);
-            }, 60 * 1000);
+            const timer = await this.bot.client.setTimeout(() => { this.expire(targetId); }, 60 * 1000);
 
             // Determine required # of votes.
             const required = Math.ceil(voters.length * .51);
 
             // Build a new votekick.
-            const created: VotekickRecord = {
+            const created: VotekickModel = {
                 timer: timer,
                 guildId: this.message.guild.id,
                 targetId: targetId,
@@ -174,17 +146,16 @@ export class Votekick extends Command {
     /** 
      * Expire a votekick.
      * @param guildId
-     * @param channelId
      * @param targetId
      */
-    private async expire(guildId: string, channelId: string, targetId: string): Promise<void> {
+    private async expire(targetId: string): Promise<void> {
         const release = await Votekick.lock.acquire();
         try {
             // Find the votekick for this guild and user if we have one.
             let foundIndex: number;
             const found = Votekick.records.find((value, index) => {
                 // Match our votekick.
-                if (guildId === value.guildId && targetId === value.targetId) {
+                if (this.message.guild.id === value.guildId && targetId === value.targetId) {
                     foundIndex = index;
                     return true;
                 }
@@ -193,15 +164,8 @@ export class Votekick extends Command {
 
             // If we found it, expire.
             if (found) {
-                const guild = this.bot.client.guilds.get(guildId);
-                if (guild) {
-                    const channel = guild.channels.get(channelId);
-                    if (channel instanceof TextChannel) {
-                        // Notify the channel that we've expired the votekick.
-                        (<TextChannel>channel).sendMessage(
-                            `Votekick for <@${targetId}> has expired with ${found.votes.length} of ${found.required} required votes.`)
-                    }
-                }
+                this.message.channel.sendMessage(
+                    `Votekick for <@${targetId}> has expired with ${found.votes.length} of ${found.required} required votes.`)
 
                 Votekick.records.splice(foundIndex, 1);
             }
