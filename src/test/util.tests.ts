@@ -5,6 +5,26 @@ import * as sinon from 'sinon'
 
 import { Util } from '../util'
 
+// Test our logging funciton.
+describe('Util.log', () => {
+    it('handles no input', () => {
+        Util.log();
+    });
+
+    it('handles null', () => {
+        Util.log(null);
+    });
+
+    it('handles a valid argument', () => {
+        Util.log('test');
+    });
+
+    it('handles multiple arguments', () => {
+        const two = 2;
+        Util.log('test', 1, {two}, { "three": 3});
+    });
+});
+
 // Test our id from string function.
 describe('Util.id', () => {
     it('handles null', () => {
