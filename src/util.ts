@@ -6,7 +6,7 @@ export class Util {
     private static DEBUG: boolean = process.env.NODE_DEBUG;
 
     /** console.log with timing. */
-    static log(...args: any[]): Promise<void> {
+    static log(...args: any[]): void {
         // Only log if debugging.
         if (!Util.DEBUG) {
             return;
