@@ -41,7 +41,7 @@ export class Util {
             return null;
         }
 
-        // We know the message part is in the given format, fast strip the parts we don't need.
+        // Return our matched id.
         return match[1];
     }
 

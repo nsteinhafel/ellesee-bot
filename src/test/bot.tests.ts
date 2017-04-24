@@ -1,6 +1,6 @@
 /// <reference path='../../node_modules/discord.js/typings/index.d.ts' />
 
-import { assert, expect, should } from 'chai';
+import { expect } from 'chai';
 import 'mocha';
 import * as sinon from 'sinon'
 
@@ -21,7 +21,7 @@ const settings: BotSettings = {
 // Test various bot constructor scenarios.
 describe('Bot creation', () => {
     it('fails for null settings', () => {
-        assert.throw(() => { new Bot(null); }, ArgumentError);
+        expect(() => { new Bot(null); }).throws(ArgumentError);
     });
 
     it('works for settings', () => {
@@ -51,10 +51,10 @@ describe('Bot startup', () => {
 
         // Make sure bot starts proper methods are called
         return bot.start().then(() => {
-            assert(login.calledOnce);
-            assert(connect.calledOnce);
-            assert(isSeeded.calledOnce);
-            assert(seed.calledOnce);
+            expect(login.calledOnce).to.be.true;
+            expect(connect.calledOnce).to.be.true;
+            expect(isSeeded.calledOnce).to.be.true;
+            expect(seed.calledOnce).to.be.true;
         });
     });
 
@@ -74,9 +74,9 @@ describe('Bot startup', () => {
 
         // Make sure bot starts proper methods are called
         return bot.start().then(() => {
-            assert(login.calledOnce);
-            assert(connect.calledOnce);
-            assert(isSeeded.calledOnce);
+            expect(login.calledOnce).to.be.true;
+            expect(connect.calledOnce).to.be.true;
+            expect(isSeeded.calledOnce).to.be.true;
         });
     });
 });
