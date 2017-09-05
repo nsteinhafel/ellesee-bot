@@ -2,8 +2,8 @@
   "name": "ellesee-bot",
   "version": "0.0.1",
   "description": "A Discord bot for me and my friends.",
-  "main": "lib/index",
-  "typings": "lib/index",
+  "main": "lib/app",
+  "typings": "lib/app",
   "scripts": {
     "start": "(export NODE_DEBUG=true; node lib/index.js)",
     "test": "mocha -r ts-node/register src/test/**/*.ts"
