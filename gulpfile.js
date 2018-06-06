@@ -9,7 +9,7 @@ gulp.task('clean', () => {
 
 gulp.task('tsc', (done) => {
     // Run the typescript compiler.
-    exec('tsc', (err, stdOut, stdErr) => {
+    exec('node ./node_modules/typescript/bin/tsc', (err, stdOut, stdErr) => {
         console.log(stdOut);
         if (err){
             done(err);
@@ -19,10 +19,10 @@ gulp.task('tsc', (done) => {
     });
 });
 
-gulp.task('copyJson', () => {
-    // Copy all of our json files to lib.
+gulp.task('copyStaticFiles', () => {
+    // Copy all of our static files to lib.
     return gulp.src('src/**/*.json')
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('default', ['clean', 'tsc', 'copyJson']);
+gulp.task('default', ['clean', 'tsc', 'copyStaticFiles']);
