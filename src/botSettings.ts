@@ -12,7 +12,4 @@ export interface DiscordSettings {
 export interface BotSettings {
     /** Discord settings. */
     discord: DiscordSettings;
-
-    /** MongoDB url. */
-    mongoUrl: string;
 }

@@ -25,19 +25,19 @@ export class Votekick extends Command {
         // Do we have two parts to this message (!votekick @user)?
         const parts = this.message.content.split(' ');
         if (parts.length != 2) {
-            this.message.channel.sendMessage(invalidFormatMessage);
+            this.message.channel.send(invalidFormatMessage);
             return;
         }
 
         // Is the second part a user?
         const targetId = Util.id(parts[1]);
         if (!targetId) {
-            this.message.channel.sendMessage(invalidFormatMessage);
+            this.message.channel.send(invalidFormatMessage);
             return;
         }
 
         // Is it a real user?
-        const target = await this.message.guild.fetchMember(targetId);
+        const target = await this.message.guild.member(targetId);
         if (!target) {
             this.message.reply('invalid user.');
             return;
@@ -97,8 +97,8 @@ export class Votekick extends Command {
             }
 
             // Get guild members and determine who can vote.
-            const voters: string[] = (await this.message.guild.fetchMembers())
-                .members.filter((member: GuildMember) =>{
+            const voters: string[] = (await this.message.guild.members.fetch({withPresences:true}))
+                .filter((member: GuildMember) =>{
                     // Eligible voters are determined at start to be non-robot online users that can send messages.
                     return !member.user.bot && member.presence.status === 'online' && member.hasPermission("SEND_MESSAGES");
                 }).map((member: GuildMember) => {
@@ -135,7 +135,7 @@ export class Votekick extends Command {
             Votekick.records.push(created);
 
             // Let the channel know we've started a votekick.
-            this.message.channel.sendMessage(
+            this.message.channel.send(
                 `Votekick initiated for <@${target.user.id}>. ${created.required - 1} more vote(s) within 1 minute required to pass.`);
         } finally {
             // Release the votekick lock.
@@ -164,7 +164,7 @@ export class Votekick extends Command {
 
             // If we found it, expire.
             if (found) {
-                this.message.channel.sendMessage(
+                this.message.channel.send(
                     `Votekick for <@${targetId}> has expired with ${found.votes.length} of ${found.required} required votes.`)
 
                 Votekick.records.splice(foundIndex, 1);

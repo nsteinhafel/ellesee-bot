@@ -4,7 +4,7 @@ var gulp = require('gulp'),
 
 gulp.task('clean', () => {
     // Kill everything in lib.
-    return del([ 'lib/**/*' ]);
+    return del([ 'dist/**/*' ]);
 });
 
 gulp.task('tsc', (done) => {
@@ -22,7 +22,7 @@ gulp.task('tsc', (done) => {
 gulp.task('copyStaticFiles', () => {
     // Copy all of our static files to lib.
     return gulp.src('src/**/*.json')
-        .pipe(gulp.dest('lib'));
+        .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['clean', 'tsc', 'copyStaticFiles']);
+gulp.task('default', gulp.series('clean', 'tsc', 'copyStaticFiles'));

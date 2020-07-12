@@ -17,7 +17,7 @@ import { Votekick } from './commands/votekick'
 export class Bot {
 
     /** Data context for the bot. */
-    public db: DataContext;
+    public dataContext: DataContext;
 
     /** Discord client. */
     public client: Client;
@@ -35,17 +35,16 @@ export class Bot {
 
     /**
      * Build a new ellesee-bot.
-     * @param discordSettings
-     * @param client
+     * @param settings
      */
     constructor(public settings: BotSettings) {
         if (!settings) throw new ArgumentError(Util.nameof({settings}));
 
+        // Initialize data context.
+        this.dataContext = new DataContext();
+
         // Initialize client.
         this.client = new Client();
-
-        // Initialize database connection.
-        this.db = new DataContext(this.settings.mongoUrl);
 
         // Setup events.
         this.client.on('ready', () => { 
@@ -99,12 +98,9 @@ export class Bot {
     async start(): Promise<void> {
         Util.log('Starting.');
 
-        // Connect too the database.
-        await this.db.connect();
-
         // Seed if necessary.
-        if (!await this.db.isSeeded()) {
-            await this.db.seed();
+        if (!await this.dataContext.isSeeded()) {
+            await this.dataContext.seed();
         }
 
         // Login to Discord.
@@ -117,8 +113,5 @@ export class Bot {
 
         // Destroy the client to stop the bot.
         await this.client.destroy();
-
-        // Close database connection.
-        await this.db.close();
     }
 }

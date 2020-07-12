@@ -3,7 +3,7 @@
 export class Util {
 
     /** Are we debugging? */
-    private static DEBUG: boolean = process.env.NODE_DEBUG;
+    private static DEBUG: boolean =  true;// process.env.NODE_DEBUG === 'true';
 
     /** console.log with timing. */
     static log(...args: any[]): void {

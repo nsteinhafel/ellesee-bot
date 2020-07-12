@@ -6,7 +6,6 @@ node_modules/
 
 # local settings
 bot-settings.json
-mongo.dev.conf
 
 # output directory
-lib/
+dist/

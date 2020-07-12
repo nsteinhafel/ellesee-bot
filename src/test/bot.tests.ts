@@ -14,8 +14,7 @@ const settings: BotSettings = {
     discord: {
         username: "ellesee-bot#1234",
         token: "** token **"
-    },
-    mongoUrl: "** invalid **"
+    }
 };
 
 // Test various bot constructor scenarios.
@@ -36,8 +35,7 @@ describe('Bot startup', () => {
     it('starts after seeding', () => {
         // Setup our spies.
         const login = sinon.spy((async (token: string) => { return token; })),
-            connect = sinon.spy((async () => {})),
-            isSeeded = sinon.spy((async () => { return false; })),
+            isSeeded = sinon.spy((() => { return false; })),
             seed = sinon.spy((async () => {}));
 
         // Create our bot.
@@ -45,14 +43,12 @@ describe('Bot startup', () => {
 
         // Stub out methods with our spies.
         sinon.stub(bot.client, 'login').callsFake(login);
-        sinon.stub(bot.db, 'connect').callsFake(connect);
-        sinon.stub(bot.db, 'isSeeded').callsFake(isSeeded);
-        sinon.stub(bot.db, 'seed').callsFake(seed);
+        sinon.stub(bot.dataContext, 'isSeeded').callsFake(isSeeded);
+        sinon.stub(bot.dataContext, 'seed').callsFake(seed);
 
         // Make sure bot starts proper methods are called
         return bot.start().then(() => {
             expect(login.calledOnce).to.be.true;
-            expect(connect.calledOnce).to.be.true;
             expect(isSeeded.calledOnce).to.be.true;
             expect(seed.calledOnce).to.be.true;
         });
@@ -61,21 +57,18 @@ describe('Bot startup', () => {
     it('starts when seeded', () => {
         // Setup our spies.
         const login = sinon.spy((async (token: string) => { return token; })),
-            connect = sinon.spy((async () => {})),
-            isSeeded = sinon.spy((async () => { return true; }));
+            isSeeded = sinon.spy((() => { return true; }));
 
         // Create our bot.
         const bot = new Bot(settings);
 
         // Stub out methods with our spies.
         sinon.stub(bot.client, 'login').callsFake(login);
-        sinon.stub(bot.db, 'connect').callsFake(connect);
-        sinon.stub(bot.db, 'isSeeded').callsFake(isSeeded);
+        sinon.stub(bot.dataContext, 'isSeeded').callsFake(isSeeded);
 
         // Make sure bot starts proper methods are called
         return bot.start().then(() => {
             expect(login.calledOnce).to.be.true;
-            expect(connect.calledOnce).to.be.true;
             expect(isSeeded.calledOnce).to.be.true;
         });
     });
