@@ -16,10 +16,9 @@ export class DataContext {
   /**
    * Build a data context.
    */
-  constructor() {
-  }
+  constructor() {}
 
-  async seed(): Promise<void> {
+  public async seed(): Promise<void> {
     const seedFolder = __dirname + "/data/",
       files = await fs.readdir(seedFolder);
     for (let file of files) {
@@ -33,24 +32,24 @@ export class DataContext {
 
       try {
         this[collectionName] = JSON.parse(data);
-      } catch(err) {
+      } catch (err) {
         Util.log(`Could not load collection '${collectionName}.'`, err);
       }
-      
     }
   }
 
   /**
    * Return true if this context is seeded.
    */
-  isSeeded(): boolean {
-      return this._isSeeded;
+  public isSeeded(): boolean {
+    return this._isSeeded;
   }
 
   /**
    * Return a readonly array of quotes.
    */
-  quotes(): QuoteModel[] {
-    return this._quotes.slice(0);
+  public quotes(): Array<QuoteModel> {
+    const quotes = this._quotes.slice(0);
+    return quotes;
   }
 }

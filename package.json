@@ -35,6 +35,6 @@
   "dependencies": {
     "async-file": "^2.0.2",
     "async-mutex": "^0.2.3",
-    "discord.js": "^12.2.0"
+    "discord.js": "github:discordjs/discord.js"
   }
 }
