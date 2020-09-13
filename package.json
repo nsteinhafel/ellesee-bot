@@ -30,7 +30,8 @@
     "mocha": "^8.1.1",
     "sinon": "^9.0.2",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "yargs-parser": ">=13.1.2"
   },
   "dependencies": {
     "async-file": "^2.0.2",
